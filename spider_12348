@@ -1,0 +1,48 @@
+import requests
+import json
+import csv
+
+n = 1
+answer = []
+
+while(n <= 30):
+
+    url = 'https://web.law.push.aegis-info.com/api/android/law_push/SFhotquestion?id=fd6f36174b9643d5ae61ae564f79a5fa&eventid=5748'
+    res = requests.get(url).text
+    data = json.loads(res)
+    n = n + 1
+
+    questions = data['data']['answer']
+
+    for question in questions:
+        answer.append(question)
+        # print(question)
+
+
+print(answer)
+csvFile = open("12348lawyer.cvs", 'wt', newline='', encoding = 'utf-8')
+writer = csv.writer(csvFile)
+for i in range(0,225):
+    headers = {'Accept':'application/json, text/plain, */*',
+               'Accept-Encoding':'gzip, deflate, br',
+               'Connection':'keep-alive',
+               'Content-type':'application/json; charset=UTF-8',
+               'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'}
+    url = "https://web.law.push.aegis-info.com/api/law_inference/robot_multi_new"
+    params = {'content':answer[i],
+              'flag':'1',
+              'userid':'web_qa_',
+              'qid':'1fd75548-8fbf-3d73-8abf-c12612c6bef0',
+              'events_ids':'5748',
+              'industry_ids':'14'}
+    res = requests.post(url, params = params, headers=headers).text
+    data = json.loads(res)
+    questions = data['data']['answer']
+
+    writer.writerow(answer[i])
+    writer.writerow(questions)
+
+    print('问题 ',i,answer[i])
+    print('答案 ',questions)
+
+csvFile.close()
